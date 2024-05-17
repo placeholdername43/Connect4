@@ -25,6 +25,7 @@ plan
 
 """
 MAIN_MENU_OPTION = "Enter 1 for Single Player, 2 for Multi Player, or 3 to Exit: "
+TOKEN_MENU_OPTION = "Enter R to play as the red token or Y to play as the yellow token: "
 
 InputText: TypeAlias = str
 
@@ -44,19 +45,17 @@ class MainMenuOption(Enum):
 
 # we want tokens to be immutable, hence the frozen, both tokens are also equal
 @dataclass(eq = True, frozen = True) 
-class X():
+class R():
     def __repr__(self) -> str:
-        return "X"
+        return "R"
     pass
-
-
 @dataclass(eq= True, frozen = True)
-class O():
+class Y():
     def __repr__(self) -> str:
         return "Y"
     pass
 
-Token: TypeAlias = X | O 
+Token: TypeAlias = R | Y 
 
 """Cell: TypeAlias = Optional[Token]
 Row: TypeAlias = Tuple[Cell,Cell,Cell]
@@ -69,7 +68,7 @@ def prompt_for_main_menu():
     while True:
         match MainMenuOption.parse(input(MAIN_MENU_OPTION)):
             case MainMenuOption.SinglePlayer:
-                print("Single Player")
+                singleplayer()
             case MainMenuOption.MultiPlayer:
                 print("Multi Player")
             case MainMenuOption.Exit:
@@ -78,8 +77,24 @@ def prompt_for_main_menu():
             case _:
                 print("Invalid input. Please try again.")
 
+def parse_Token(s: InputText) -> Optional[Token]:
+        match s.lower():
+            case "r" | "red" | "1":
+                print("Red Token Selected!")
+                return R()
+            case "y" | "yellow" | "2":
+                print("Yellow Token Selected!")
+                return Y()
+            case _:
+                print("Invalid input pick a correct token (R/Y)")
 
+def prompt_for_token():
+    while True:
+        match parse_Token(input(TOKEN_MENU_OPTION)):
+            case _ as Token:
+                return Token
 
+                                      
 """def place_token_in_grid(g: Grid, c:Coord, t:Token) -> Optional[Grid]:
 
 def place_token_in_row(r:Row, ca:AxisCoord, t:Token) -> Optional[Row]:
@@ -90,7 +105,7 @@ def place_token_in_row(r:Row, ca:AxisCoord, t:Token) -> Optional[Row]:
 
 
 def singleplayer():
-    print("Single Player")
+    prompt_for_token()
 
 def multiplayer():
     print("Multi Player")
@@ -105,7 +120,7 @@ def branch_to_game_feature(opt: MainMenuOption):
     then branch to a feature"""
     match opt:
         case MainMenuOption.SinglePlayer:
-            print("Single Player")
+            singleplayer()
         case MainMenuOption.MultiPlayer:
             print("Multi Player")
         case MainMenuOption.Exit:
