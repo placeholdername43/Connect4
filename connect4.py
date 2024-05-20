@@ -42,7 +42,19 @@ class MainMenuOption(Enum):
             case "3" | "exit": return MainMenuOption.Exit
             case _: return None
 
-
+def prompt_for_main_menu():
+    while True:
+        match MainMenuOption.parse(input(MAIN_MENU_OPTION)):
+            case MainMenuOption.SinglePlayer:
+                singleplayer()
+            case MainMenuOption.MultiPlayer:
+                print("Multi Player")
+            case MainMenuOption.Exit:
+                print("Goodbye")
+                exit()
+            case _:
+                print("Invalid input. Please try again.")
+                        
 # we want tokens to be immutable, hence the frozen, both tokens are also equal
 @dataclass(eq = True, frozen = True) 
 class R():
@@ -58,9 +70,9 @@ class Y():
 Token: TypeAlias = R | Y 
 
 Cell: TypeAlias = Optional[Token] # define the cell type 
-Column: TypeAlias = Tuple[Cell, Cell, Cell, Cell, Cell, Cell]
-Grid: TypeAlias = Tuple[Column, Column, Column, Column, Column, Column, Column]
-grid: Grid = tuple(tuple(None for _ in range(6)) for _ in range(7)) 
+Column: TypeAlias = Tuple[Cell, Cell, Cell, Cell, Cell, Cell] # defining a column as a tuple of 6 cells reflecting the 6 high grid of connect 4
+Grid: TypeAlias = Tuple[Column, Column, Column, Column, Column, Column, Column] # a grid is therefore a tuple of 7 columns reflecting the 7 high grid of connect4
+grid: Grid = tuple(tuple(None for _ in range(6)) for _ in range(7)) # the grid is therefore created as a first having empty values in each row, as no tokens are placed initially
 
 def print_grid(grid: Grid):
     for row in range(5, -1, -1):
@@ -86,8 +98,11 @@ def prompt_for_token_placement():
             case _:
                 print("Invalid input. Please try again.")
 
-def place_token(grid: Grid, tokenPlacement, Token):
-    pass
+                                      
+def place_token_in_grid(g: Grid, c:Column, t:Token) -> Optional[Grid]:
+    match c:
+        case(None):
+            print("test")
 
 
 """
@@ -97,18 +112,7 @@ Grid: TypeAlias = Tuple[Row,Row,Row]
 exampleRow : Row(None,None,None)
 exampleGrid : Grid =  """
 
-def prompt_for_main_menu():
-    while True:
-        match MainMenuOption.parse(input(MAIN_MENU_OPTION)):
-            case MainMenuOption.SinglePlayer:
-                singleplayer()
-            case MainMenuOption.MultiPlayer:
-                print("Multi Player")
-            case MainMenuOption.Exit:
-                print("Goodbye")
-                exit()
-            case _:
-                print("Invalid input. Please try again.")
+
 
 """def parse_Token(s: InputText) -> Optional[Token]:
         match s.lower():
@@ -138,13 +142,7 @@ def prompt_for_token() -> Optional[Token]:
                 return Y()
             case _:
                 return None
-                                      
-"""def place_token_in_grid(g: Grid, c:Coord, t:Token) -> Optional[Grid]:
 
-def place_token_in_row(r:Row, ca:AxisCoord, t:Token) -> Optional[Row]:
-    match r:
-        case(None,None,None):
-            pass"""
    
 
 
@@ -153,14 +151,14 @@ def place_token_in_row(r:Row, ca:AxisCoord, t:Token) -> Optional[Row]:
 def singleplayer():
     prompt_for_token()
     print_grid(grid)
+    place_token_in_grid()
 
 def multiplayer():
-    print("Multi Player")
+    prompt_for_token()
+    print_grid(grid)
 
 def exit():
     quit()
-
-
 
 def branch_to_game_feature(opt: MainMenuOption):
     """prompt for menu option
