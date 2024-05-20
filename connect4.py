@@ -26,6 +26,7 @@ plan
 """
 MAIN_MENU_OPTION = "Enter 1 for Single Player, 2 for Multi Player, or 3 to Exit: "
 TOKEN_MENU_OPTION = "Enter R to play as the red token or Y to play as the yellow token: "
+TOKEN_PLACEMENT_COLUMN = "What column do you want the token in?, between (1-7): "
 
 InputText: TypeAlias = str
 
@@ -42,18 +43,7 @@ class MainMenuOption(Enum):
             case "3" | "exit": return MainMenuOption.Exit
             case _: return None
 
-def prompt_for_main_menu():
-    while True:
-        match MainMenuOption.parse(input(MAIN_MENU_OPTION)):
-            case MainMenuOption.SinglePlayer:
-                singleplayer()
-            case MainMenuOption.MultiPlayer:
-                print("Multi Player")
-            case MainMenuOption.Exit:
-                print("Goodbye")
-                exit()
-            case _:
-                print("Invalid input. Please try again.")
+
                         
 # we want tokens to be immutable, hence the frozen, both tokens are also equal
 @dataclass(eq = True, frozen = True) 
@@ -77,32 +67,32 @@ grid: Grid = tuple(tuple(None for _ in range(6)) for _ in range(7)) # the grid i
 def print_grid(grid: Grid):
     for row in range(5, -1, -1):
         for column in grid:
-            cell = column[row]
+            cell = column[row] # a cell is a point intersecting a certain row and column
             print(cell if cell is not None else '[ ]', end=' ')
         print(row)
     for i in range(1, 8, 1):
         print(f'{i:^3}', end = ' ')
     
-
-
-def prompt_for_token_placement():
+def prompt_for_token_placement() -> int:
     while True:
-        match MainMenuOption.parse(input(MAIN_MENU_OPTION)):
-            case MainMenuOption.SinglePlayer:
-                singleplayer()
-            case MainMenuOption.MultiPlayer:
-                print("Multi Player")
-            case MainMenuOption.Exit:
-                print("Goodbye")
-                exit()
-            case _:
-                print("Invalid input. Please try again.")
-
-                                      
+        n: int = int(input(TOKEN_PLACEMENT_COLUMN))
+        if 1 <= n <= 6:
+            return(n)
+        else:
+            print("Invalid input, please enter a number between 1-7")
+                           
 def place_token_in_grid(g: Grid, c:Column, t:Token) -> Optional[Grid]:
-    match c:
-        case(None):
-            print("test")
+    if c in grid:
+        for column in grid:
+            if Cell == None:
+                Cell = R
+                return grid
+            """
+    for row in range(5, -1, -1):
+        for column in grid:
+            cell = column[row] # a cell is a point intersecting a certain row and column
+            print(cell if cell is not None else '[ ]', end=' ')
+        print(row)"""
 
 
 """
@@ -132,7 +122,7 @@ def prompt_for_token():
             case _ as Token:
                 return Token"""
 
-def prompt_for_token() -> Optional[Token]:
+def prompt_for_token_type() -> Optional[Token]:
     while True:
         s: str = input(TOKEN_MENU_OPTION)
         match s.lower():
@@ -143,22 +133,27 @@ def prompt_for_token() -> Optional[Token]:
             case _:
                 return None
 
-   
-
-
-
-
 def singleplayer():
-    prompt_for_token()
+    prompt_for_token_type()
     print_grid(grid)
-    place_token_in_grid()
+    place_token_in_grid(grid, prompt_for_token_placement(), R)
+    print_grid(grid)
+
+    
 
 def multiplayer():
-    prompt_for_token()
-    print_grid(grid)
+    pass
 
 def exit():
     quit()
+
+def prompt_for_main_menu_input():
+    while True:
+        match MainMenuOption.parse(input(MAIN_MENU_OPTION)):
+            case x if type(x) == MainMenuOption:
+                return x
+            case _:
+                print("ERROR: not a valid menu option")
 
 def branch_to_game_feature(opt: MainMenuOption):
     """prompt for menu option
@@ -172,7 +167,6 @@ def branch_to_game_feature(opt: MainMenuOption):
             print("Goodbye")
             return
         
-
-
+    
 if __name__ == "__main__":
-    branch_to_game_feature(prompt_for_main_menu())
+    branch_to_game_feature(prompt_for_main_menu_input())
