@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import TypeAlias, Optional
+from typing import Tuple, TypeAlias, Optional
 import numpy as np 
 from dataclasses import dataclass
 
@@ -41,7 +41,7 @@ class MainMenuOption(Enum):
             case "2" | "multiplayer": return MainMenuOption.MultiPlayer
             case "3" | "exit": return MainMenuOption.Exit
             case _: return None
-            
+
 
 # we want tokens to be immutable, hence the frozen, both tokens are also equal
 @dataclass(eq = True, frozen = True) 
@@ -57,7 +57,40 @@ class Y():
 
 Token: TypeAlias = R | Y 
 
-"""Cell: TypeAlias = Optional[Token]
+Cell: TypeAlias = Optional[Token] # define the cell type 
+Column: TypeAlias = Tuple[Cell, Cell, Cell, Cell, Cell, Cell]
+Grid: TypeAlias = Tuple[Column, Column, Column, Column, Column, Column, Column]
+grid: Grid = tuple(tuple(None for _ in range(6)) for _ in range(7)) 
+
+def print_grid(grid: Grid):
+    for row in range(5, -1, -1):
+        for column in grid:
+            cell = column[row]
+            print(cell if cell is not None else '[ ]', end=' ')
+        print(row)
+    for i in range(1, 8, 1):
+        print(f'{i:^3}', end = ' ')
+    
+
+
+def prompt_for_token_placement():
+    while True:
+        match MainMenuOption.parse(input(MAIN_MENU_OPTION)):
+            case MainMenuOption.SinglePlayer:
+                singleplayer()
+            case MainMenuOption.MultiPlayer:
+                print("Multi Player")
+            case MainMenuOption.Exit:
+                print("Goodbye")
+                exit()
+            case _:
+                print("Invalid input. Please try again.")
+
+def place_token(grid: Grid, tokenPlacement, Token):
+    pass
+
+
+"""
 Row: TypeAlias = Tuple[Cell,Cell,Cell]
 Grid: TypeAlias = Tuple[Row,Row,Row]
 
@@ -77,7 +110,7 @@ def prompt_for_main_menu():
             case _:
                 print("Invalid input. Please try again.")
 
-def parse_Token(s: InputText) -> Optional[Token]:
+"""def parse_Token(s: InputText) -> Optional[Token]:
         match s.lower():
             case "r" | "red" | "1":
                 print("Red Token Selected!")
@@ -87,13 +120,24 @@ def parse_Token(s: InputText) -> Optional[Token]:
                 return Y()
             case _:
                 print("Invalid input pick a correct token (R/Y)")
+                return None
 
 def prompt_for_token():
     while True:
         match parse_Token(input(TOKEN_MENU_OPTION)):
             case _ as Token:
-                return Token
+                return Token"""
 
+def prompt_for_token() -> Optional[Token]:
+    while True:
+        s: str = input(TOKEN_MENU_OPTION)
+        match s.lower():
+            case "r" | "red" | "1":
+                return R()
+            case "y" | "yellow" | "2":
+                return Y()
+            case _:
+                return None
                                       
 """def place_token_in_grid(g: Grid, c:Coord, t:Token) -> Optional[Grid]:
 
@@ -104,8 +148,11 @@ def place_token_in_row(r:Row, ca:AxisCoord, t:Token) -> Optional[Row]:
    
 
 
+
+
 def singleplayer():
     prompt_for_token()
+    print_grid(grid)
 
 def multiplayer():
     print("Multi Player")
