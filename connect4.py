@@ -79,13 +79,12 @@ def create_empty_grid() -> Grid:
 def print_grid(grid: Grid):
     for row in range(5, -1, -1):
         for column in grid:
-            cell = column[row]
+            cell = column[row] # a cell is a point intersecting a certain row and column
             print(cell if cell is not None else '[ ]', end=' ')
-        print()
-    for i in range(1, 8):
-        print(f'{i:^3}', end=' ')
+        print(row)
+    for i in range(1, 8, 1):
+        print(f'{i:^3}', end = ' ')
     print()
-
     
 def prompt_for_token_placement() -> int:
     while True:
@@ -98,7 +97,7 @@ def prompt_for_token_placement() -> int:
 
 
 def check_any_empty_cell(c: Column):
-    for i in range(0,len (c) - 1):
+    for i in range(len(c)):
         if c[i] == None:
             return i
         return None
@@ -115,9 +114,6 @@ def drop_token_in_column(c:Column, t:Token) -> Optional[Column]:
 def place_new_column_in_grid(grid: Grid, column_idx: int, new_column: Column) -> Grid:
     return grid[:column_idx] + (new_column,) + grid[column_idx + 1:]
         
-
-
-
 def prompt_for_token_type() -> Optional[Token]:
     while True:
         s: str = input(TOKEN_MENU_OPTION)
@@ -131,19 +127,18 @@ def prompt_for_token_type() -> Optional[Token]:
 
 
 
-def singleplayer(grid: Grid):
-    ChosenToken = prompt_for_token_type()
+def singleplayer(grid: Grid) -> Grid:
+    chosen_token = prompt_for_token_type()
     print_grid(grid)
-    chosenColIdx = prompt_for_token_placement()
-    chosenCol = grid[chosenColIdx]
-    newCol = drop_token_in_column(chosenCol, ChosenToken)
-    if newCol:
-        grid = place_new_column_in_grid(grid, chosenColIdx, newCol)
+    chosen_col_idx = prompt_for_token_placement()
+    chosen_col = grid[chosen_col_idx]
+    new_col = drop_token_in_column(chosen_col, chosen_token)
+    if new_col:
+        grid = place_new_column_in_grid(grid, chosen_col_idx, new_col)
     else:
         print("Column is full!")
     print_grid(grid)
     return grid
-    
 
     
 
@@ -162,22 +157,20 @@ def prompt_for_main_menu_input():
                 print("ERROR: not a valid menu option")
 
 def branch_to_game_feature(opt: MainMenuOption):
-    """prompt for menu option
-    then branch to a feature"""
     match opt:
         case MainMenuOption.SinglePlayer:
-            singleplayer(Grid)
+            singleplayer()
         case MainMenuOption.MultiPlayer:
-            print("Multi Player")
+            pass
         case MainMenuOption.Exit:
-            print("Goodbye")
-            return
-        
-    
-if __name__ == "__main__":
-    branch_to_game_feature(prompt_for_main_menu_input())
+            pass
 
 
+def main():
+    grid = create_empty_grid()
+    while True:
+        menu_option = prompt_for_main_menu_input()
+        grid = branch_to_game_feature(menu_option, grid)
 
 """
     for row in range(5, -1, -1):
