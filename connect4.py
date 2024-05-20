@@ -59,10 +59,14 @@ class Y():
 
 Token: TypeAlias = R | Y 
 
+
 Cell: TypeAlias = Optional[Token] # define the cell type 
+# Another datastructure could be a stack 
 Column: TypeAlias = Tuple[Cell, Cell, Cell, Cell, Cell, Cell] # defining a column as a tuple of 6 cells reflecting the 6 high grid of connect 4
 Grid: TypeAlias = Tuple[Column, Column, Column, Column, Column, Column, Column] # a grid is therefore a tuple of 7 columns reflecting the 7 high grid of connect4
-grid: Grid = tuple(tuple(None for _ in range(6)) for _ in range(7)) # the grid is therefore created as a first having empty values in each row, as no tokens are placed initially
+grid: Grid = list(list(None for _ in range(6)) for _ in range(7)) # the grid is therefore created as a first having empty values in each row, as no tokens are placed initially
+
+
 
 def print_grid(grid: Grid):
     for row in range(5, -1, -1):
@@ -77,17 +81,38 @@ def prompt_for_token_placement() -> int:
     while True:
         n: int = int(input(TOKEN_PLACEMENT_COLUMN))
         if 1 <= n <= 6:
-            return(n)
+            return n
         else:
             print("Invalid input, please enter a number between 1-7")
-                           
-def place_token_in_grid(g: Grid, c:Column, t:Token) -> Optional[Grid]:
-    if c in grid:
-        for column in grid:
-            if Cell == None:
-                Cell = R
-                return grid
-            """
+
+def provide_column_specified_by_user_to_place_in(n):
+    return grid[n-1]
+
+def check_any_empty_cell(c: Column):
+    for i in range(0,len (c) - 1):
+        if c[i] == None:
+            return i
+            
+        return None
+
+def drop_token_in_column(c:Column, t:Token) -> Optional[Column]:
+    match check_any_empty_cell(c):
+        case None:
+            return None
+        case i:
+            temp = list(c)
+            temp[i] = t
+            c = tuple(temp)
+            c = Column
+            return c
+        
+def place_new_column_in_grid(columnIdx, newColumn: Column) -> Grid:
+    print(grid[columnIdx])
+    grid[columnIdx] 
+    return grid
+        
+
+"""
     for row in range(5, -1, -1):
         for column in grid:
             cell = column[row] # a cell is a point intersecting a certain row and column
@@ -134,10 +159,14 @@ def prompt_for_token_type() -> Optional[Token]:
                 return None
 
 def singleplayer():
-    prompt_for_token_type()
+    prompt_for_main_menu_input()
+    ChosenToken = prompt_for_token_type()
+    chosenColIdx = prompt_for_token_placement()
+    chosenCol = provide_column_specified_by_user_to_place_in(chosenColIdx)
+    newCol = drop_token_in_column(chosenCol, ChosenToken)
+    place_new_column_in_grid(chosenColIdx, newCol)
     print_grid(grid)
-    place_token_in_grid(grid, prompt_for_token_placement(), R)
-    print_grid(grid)
+    
 
     
 
