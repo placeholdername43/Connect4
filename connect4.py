@@ -23,25 +23,7 @@ class MainMenuOption(Enum):
             case "2" | "multiplayer": return MainMenuOption.MultiPlayer
             case "3" | "exit": return MainMenuOption.Exit
             case _: return None
-
-class BoundedStack: 
-    def __init__(self, capacity):
-        self.items = []
-        self._maxSize = capacity
-        assert(capacity >= 0), "not positive"
-
-        try:
-            capacity = int(capacity)
-        except TypeError as inst:
-            print("Error", inst.args)
-        except:
-            print("error")
-        else:
-            itemmax = capacity
-
-
-
-                        
+                      
 # we want tokens to be immutable, hence the frozen, both tokens are also equal
 @dataclass(eq = True, frozen = True) 
 class R():
@@ -93,7 +75,7 @@ def check_for_win(g: Grid, t: Token) -> bool:
     # a win can be horizontal, diagonal, vertical
     # how will i check thru the grid in all directions to determine a win
     # potentially a function to check in each direction?
-    pass
+    return True
 
 def drop_token_in_column(c:Column, t:Token) -> Optional[Column]:
     match check_any_empty_cell(c):
