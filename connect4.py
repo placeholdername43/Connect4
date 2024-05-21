@@ -154,6 +154,8 @@ def multiplayer():
     game_loop(grid, 0, tokens)
 
 def exit_game():
+    print("Are you sure you would like to quit? Y/N")
+    print("TODO: Need to add quit prompt declaratively ")
     quit()
 
 def prompt_for_main_menu_input():
@@ -171,7 +173,6 @@ def branch_to_game_feature(opt: MainMenuOption):
         case MainMenuOption.MultiPlayer:
             multiplayer()
         case MainMenuOption.Exit:
-            print("Goodbye")
             exit_game()
 
 
