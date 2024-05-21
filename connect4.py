@@ -33,15 +33,28 @@ class Y():
         return "Y"
     pass
 
-
 Token: TypeAlias = R | Y 
 Cell: TypeAlias = Optional[Token] # define the cell type 
 # Another datastructure could be a stack 
 Column: TypeAlias = Tuple[Cell, Cell, Cell, Cell, Cell, Cell] # defining a column as a tuple of 6 cells reflecting the 6 high grid of connect 4
 Grid: TypeAlias = Tuple[Column, Column, Column, Column, Column, Column, Column] # a grid is therefore a tuple of 7 columns reflecting the 7 high grid of connect4
 
+def prompt_for_token_type() -> Optional[Token]:
+    while True:
+        s: InputText = input(TOKEN_MENU_OPTION)
+        match s.lower():
+            case "r" | "red" | "1":
+                return R()
+            case "y" | "yellow" | "2":
+                return Y()
+            case _:
+                print("Invalid token type, R or Y")
+                prompt_for_token_type()
+
 def create_empty_grid() -> Grid:
-    return tuple(tuple(None for _ in range(6)) for _ in range(7))
+    c: Column = (None, None, None, None,None, None)
+    g : Grid = (c,c,c,c,c,c,c)
+    return g
 
 def print_grid(grid: Grid):
     for row in range(5, -1, -1):
@@ -80,22 +93,12 @@ def drop_token_in_column(c:Column, t:Token) -> Optional[Column]:
         case i:
             newColumn = list(c)
             newColumn[i] = t
-            return tuple(newColumn)
+            result : Column = tuple(newColumn)
+            return result
         
 def place_new_column_in_grid(grid: Grid, columnIdx: int, newColumn: Column) -> Grid:
     return grid[:columnIdx] + (newColumn,) + grid[columnIdx + 1:]
         
-def prompt_for_token_type() -> Optional[Token]:
-    while True:
-        s: str = input(TOKEN_MENU_OPTION)
-        match s.lower():
-            case "r" | "red" | "1":
-                return R()
-            case "y" | "yellow" | "2":
-                return Y()
-            case _:
-                return None
-
 def check_grid_full(grid: Grid) -> bool:
     return not any(check_any_empty_cell(col) is not None for col in grid)
 
@@ -127,8 +130,13 @@ def singleplayer():
     print("Singleplayer placeholder.")
 
 def multiplayer():
+    player1_token = prompt_for_token_type()
+    if isinstance(player1_token, R):
+        player2_token = Y()
+    else:
+        player2_token = R()
+    tokens = (player1_token, player2_token)
     grid = create_empty_grid()
-    tokens = (R(), Y())
     game_loop(grid, 0, tokens)
 
 def exit_game():
