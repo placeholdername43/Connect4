@@ -3,13 +3,9 @@ from typing import Final, Tuple, TypeAlias, Optional
 import numpy as np 
 from dataclasses import dataclass
 
-# connect4 - a simple connect 4 game made using functional programming
-
 MAIN_MENU_OPTION: Final[str] = "Enter 1 for Single Player, 2 for Multi Player, or 3 to Exit: "
 TOKEN_MENU_OPTION: Final[str] = "Enter R to play as the red token or Y to play as the yellow token: "
 TOKEN_PLACEMENT_COLUMN: Final[str] = "What column do you want the token in?, between (1-7): "
-
-InputText: TypeAlias = str
 
 class MainMenuOption(Enum):
     SinglePlayer = 1
@@ -36,9 +32,8 @@ class Y():
         return "Y"
     pass
 
+InputText: TypeAlias = str
 Token: TypeAlias = R | Y 
-
-
 Cell: TypeAlias = Optional[Token] # define the cell type 
 # Another datastructure could be a stack 
 Column: TypeAlias = Tuple[Cell, Cell, Cell, Cell, Cell, Cell] # defining a column as a tuple of 6 cells reflecting the 6 high grid of connect 4
@@ -157,47 +152,10 @@ def branch_to_game_feature(opt: MainMenuOption):
         case MainMenuOption.Exit:
             exit_game()
 
-
 def main():
     while True:
         menu_option = prompt_for_main_menu_input()
         grid = branch_to_game_feature(menu_option)
 
-
 if __name__ == "__main__":
     main()
-
-"""
-    for row in range(5, -1, -1):
-        for column in grid:
-            cell = column[row] # a cell is a point intersecting a certain row and column
-            print(cell if cell is not None else '[ ]', end=' ')
-        print(row)"""
-
-
-"""
-Row: TypeAlias = Tuple[Cell,Cell,Cell]
-Grid: TypeAlias = Tuple[Row,Row,Row]
-
-exampleRow : Row(None,None,None)
-exampleGrid : Grid =  """
-
-
-
-"""def parse_Token(s: InputText) -> Optional[Token]:
-        match s.lower():
-            case "r" | "red" | "1":
-                print("Red Token Selected!")
-                return R()
-            case "y" | "yellow" | "2":
-                print("Yellow Token Selected!")
-                return Y()
-            case _:
-                print("Invalid input pick a correct token (R/Y)")
-                return None
-
-def prompt_for_token():
-    while True:
-        match parse_Token(input(TOKEN_MENU_OPTION)):
-            case _ as Token:
-                return Token"""
