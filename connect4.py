@@ -75,7 +75,7 @@ def check_for_win(g: Grid, t: Token) -> bool:
     # a win can be horizontal, diagonal, vertical
     # how will i check thru the grid in all directions to determine a win
     # potentially a function to check in each direction?
-    return True
+    pass
 
 def drop_token_in_column(c:Column, t:Token) -> Optional[Column]:
     match check_any_empty_cell(c):
