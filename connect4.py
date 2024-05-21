@@ -65,54 +65,47 @@ Grid: TypeAlias = Tuple[Column, Column, Column, Column, Column, Column, Column] 
 def create_empty_grid() -> Grid:
     return tuple(tuple(None for _ in range(6)) for _ in range(7))
 
-
-"""
-# Bounded Stack
-
-
-
-"""
-
-
-
-
 def print_grid(grid: Grid):
     for row in range(5, -1, -1):
+        print("|", end="")
         for column in grid:
-            cell = column[row] # a cell is a point intersecting a certain row and column
-            print(cell if cell is not None else '[ ]', end=' ')
-        print(row)
-    for i in range(1, 8, 1):
-        print(f'{i:^3}', end = ' ')
-    print()
+            cell = column[row]  # A cell is a point intersecting a certain row and column
+            print(f" {cell if cell is not None else ' '} ", end="|")
+        print()
+    print(" " + "   ".join(map(str, range(1, 8))))
     
 def prompt_for_token_placement() -> int:
     while True:
-        n: int = int(input(TOKEN_PLACEMENT_COLUMN))
-        if 1 <= n <= 7:
-            return n - 1
-        else:
-            print("Invalid input, please enter a number between 1-7")
+        n = input(TOKEN_PLACEMENT_COLUMN)
+        match n:
+            case _ if n.isdigit() and 1 <= int(n) <= 7:
+                return int(n) - 1
+            case _:
+                print("Invalid input, please enter a number between 1-7")
 
-
-
-def check_any_empty_cell(c: Column):
+def check_any_empty_cell(c: Column) -> Optional[int]:
     for i in range(len(c)):
-        if c[i] == None:
+        if c[i] is None:
             return i
-        return None
+    return None
+
+def check_for_win(g: Grid, t: Token) -> bool:
+    # a win can be horizontal, diagonal, vertical
+    # how will i check thru the grid in all directions to determine a win
+    # potentially a function to check in each direction?
+    pass
 
 def drop_token_in_column(c:Column, t:Token) -> Optional[Column]:
     match check_any_empty_cell(c):
         case None:
             return None
         case i:
-            temp = list(c)
-            temp[i] = t
-            return tuple(temp)
+            newColumn = list(c)
+            newColumn[i] = t
+            return tuple(newColumn)
         
-def place_new_column_in_grid(grid: Grid, column_idx: int, new_column: Column) -> Grid:
-    return grid[:column_idx] + (new_column,) + grid[column_idx + 1:]
+def place_new_column_in_grid(grid: Grid, columnIdx: int, newColumn: Column) -> Grid:
+    return grid[:columnIdx] + (newColumn,) + grid[columnIdx + 1:]
         
 def prompt_for_token_type() -> Optional[Token]:
     while True:
@@ -125,27 +118,42 @@ def prompt_for_token_type() -> Optional[Token]:
             case _:
                 return None
 
+def check_grid_full(grid: Grid) -> bool:
+    return not any(check_any_empty_cell(col) is not None for col in grid)
 
-
-def singleplayer(grid: Grid) -> Grid:
-    chosen_token = prompt_for_token_type()
+def turn_by_turn(grid: Grid, playerIdx: int, tokens: Tuple[Token, Token]) -> Tuple[Grid, bool]:
     print_grid(grid)
-    chosen_col_idx = prompt_for_token_placement()
-    chosen_col = grid[chosen_col_idx]
-    new_col = drop_token_in_column(chosen_col, chosen_token)
-    if new_col:
-        grid = place_new_column_in_grid(grid, chosen_col_idx, new_col)
-    else:
-        print("Column is full!")
-    print_grid(grid)
-    return grid
+    print(f"Player {playerIdx + 1}'s turn ({tokens[playerIdx]}):")
+    columnIdx = prompt_for_token_placement()
+    newColumn = drop_token_in_column(grid[columnIdx], tokens[playerIdx])
+    if newColumn is None:
+        print("Column is full! Try a different column.")
+        return grid, False
+    newGrid = place_new_column_in_grid(grid, columnIdx, newColumn)
+    if check_for_win(newGrid, tokens[playerIdx]):
+        print_grid(newGrid)
+        print(f"Player {playerIdx + 1} ({tokens[playerIdx]}) wins!")
+        return newGrid, True
+    if check_grid_full(newGrid):
+        print_grid(newGrid)
+        print("The game is a draw!")
+        return newGrid, True
+    return newGrid, False
 
-    
+def game_loop(grid: Grid, playerIdx: int, tokens: Tuple[Token, Token]):
+    new_grid, game_over = turn_by_turn(grid, playerIdx, tokens)
+    if not game_over:
+        game_loop(new_grid, 1 - playerIdx, tokens)
+
+def singleplayer():
+    print("Singleplayer placeholder.")
 
 def multiplayer():
-    pass
+    grid = create_empty_grid()
+    tokens = (R(), Y())
+    game_loop(grid, 0, tokens)
 
-def exit():
+def exit_game():
     quit()
 
 def prompt_for_main_menu_input():
@@ -161,16 +169,16 @@ def branch_to_game_feature(opt: MainMenuOption):
         case MainMenuOption.SinglePlayer:
             singleplayer()
         case MainMenuOption.MultiPlayer:
-            pass
+            multiplayer()
         case MainMenuOption.Exit:
-            pass
+            print("Goodbye")
+            exit_game()
 
 
 def main():
-    grid = create_empty_grid()
     while True:
         menu_option = prompt_for_main_menu_input()
-        grid = branch_to_game_feature(menu_option, grid)
+        grid = branch_to_game_feature(menu_option)
 
 
 if __name__ == "__main__":
