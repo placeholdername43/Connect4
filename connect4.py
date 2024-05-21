@@ -172,6 +172,10 @@ def main():
         menu_option = prompt_for_main_menu_input()
         grid = branch_to_game_feature(menu_option, grid)
 
+
+if __name__ == "__main__":
+    main()
+
 """
     for row in range(5, -1, -1):
         for column in grid:
