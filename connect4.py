@@ -6,6 +6,7 @@ from dataclasses import dataclass
 MAIN_MENU_OPTION: Final[str] = "Enter 1 for Single Player, 2 for Multi Player, or 3 to Exit: "
 TOKEN_MENU_OPTION: Final[str] = "Enter R to play as the red token or Y to play as the yellow token: "
 TOKEN_PLACEMENT_COLUMN: Final[str] = "What column do you want the token in?, between (1-7): "
+InputText: TypeAlias = str
 
 class MainMenuOption(Enum):
     SinglePlayer = 1
@@ -32,7 +33,7 @@ class Y():
         return "Y"
     pass
 
-InputText: TypeAlias = str
+
 Token: TypeAlias = R | Y 
 Cell: TypeAlias = Optional[Token] # define the cell type 
 # Another datastructure could be a stack 
