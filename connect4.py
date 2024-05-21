@@ -1,13 +1,13 @@
 from enum import Enum
-from typing import Tuple, TypeAlias, Optional
+from typing import Final, Tuple, TypeAlias, Optional
 import numpy as np 
 from dataclasses import dataclass
 
 # connect4 - a simple connect 4 game made using functional programming
 
-MAIN_MENU_OPTION = "Enter 1 for Single Player, 2 for Multi Player, or 3 to Exit: "
-TOKEN_MENU_OPTION = "Enter R to play as the red token or Y to play as the yellow token: "
-TOKEN_PLACEMENT_COLUMN = "What column do you want the token in?, between (1-7): "
+MAIN_MENU_OPTION: Final[str] = "Enter 1 for Single Player, 2 for Multi Player, or 3 to Exit: "
+TOKEN_MENU_OPTION: Final[str] = "Enter R to play as the red token or Y to play as the yellow token: "
+TOKEN_PLACEMENT_COLUMN: Final[str] = "What column do you want the token in?, between (1-7): "
 
 InputText: TypeAlias = str
 
