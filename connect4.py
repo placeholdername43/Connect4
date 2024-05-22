@@ -92,13 +92,14 @@ def check_any_empty_cell(c: Column) -> Optional[int]:
     return None
 
 def check_for_win(grid: Grid, token: Token) -> bool:
-    def check_direction(start_row, start_col, dir_row, dir_col):
+    def check_direction(start_row, start_col, direction_row, direction_col):
         count = 0
-        row, col = start_row, start_col
+        row = start_row
+        col = start_col
         while 0 <= row < 6 and 0 <= col < 7 and grid[col][row] == token:
             count += 1
-            row += dir_row
-            col += dir_col
+            row += direction_row
+            col += direction_col
         return count
 
     for col in range(7):
@@ -110,25 +111,6 @@ def check_for_win(grid: Grid, token: Token) -> bool:
                     check_direction(row, col, 1, -1) >= 4):  # diagonal up-right
                     return True
     return False
-"""def check_for_win(grid: Grid, token: Token) -> bool:
-    directions = [(1, 0), (0, 1), (1, 1), (1, -1)]
-
-    def check_direction(start_row, start_col, dir_row, dir_col):
-        return all(
-            0 <= start_row + i * dir_row < 6 and
-            0 <= start_col + i * dir_col < 7 and
-            grid[start_col + i * dir_col][start_row + i * dir_row] == token
-            for i in range(4)
-        )
-
-    return any(
-        any(
-            grid[col][row] == token and any(check_direction(row, col, dr, dc) for dr, dc in directions)
-            for row in range(6)
-        )
-        for col in range(7)
-    ) """
-            
 
 def drop_token_in_column(c:Column, t:Token) -> Optional[Column]:
     match check_any_empty_cell(c):
