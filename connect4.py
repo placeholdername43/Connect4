@@ -1,9 +1,10 @@
 from enum import Enum
+import sys
 from typing import Final, Tuple, TypeAlias, Optional
 import numpy as np 
 from dataclasses import dataclass
 
-MAIN_MENU_OPTION: Final[str] = """
+MAIN_MENU_MSG: Final[str] = """
 Welcome to Connect Four!
 
 What would you like to do?
@@ -66,7 +67,7 @@ def create_empty_grid() -> Grid:
     g : Grid = (c,c,c,c,c,c,c)
     return g
 
-def print_grid(grid: Grid):
+def print_grid(grid: Grid) -> None: # change to render and seperate print
     for row in range(5, -1, -1):
         print("|", end="")
         for column in grid:
@@ -75,15 +76,15 @@ def print_grid(grid: Grid):
         print()
     print(" " + "   ".join(map(str, range(1, 8))))
 
-    
-def prompt_for_token_placement() -> int:
+def prompt_for_token_placement(msg: str = TOKEN_PLACEMENT_COLUMN, err : str = "ERROR: Invalid input, please select a column between 1-7") -> int:
     while True:
-        n = input(TOKEN_PLACEMENT_COLUMN)
+        n = input(msg)
         match n:
+            case None:
+                print(err, file=sys.stderr)
             case _ if n.isdigit() and 1 <= int(n) <= 7:
                 return int(n) - 1
-            case _:
-                print("Invalid input, please enter a number between 1-7")
+            
 
 def check_any_empty_cell(c: Column) -> Optional[int]:
     for i in range(len(c)):
@@ -91,8 +92,7 @@ def check_any_empty_cell(c: Column) -> Optional[int]:
             return i
     return None
 
-def check_for_win(grid: Grid, token: Token) -> bool:
-    def check_direction(start_row, start_col, direction_row, direction_col):
+def check_direction(grid: Grid, start_row, start_col, direction_row, direction_col, token) -> int:
         count = 0
         row = start_row
         col = start_col
@@ -102,13 +102,15 @@ def check_for_win(grid: Grid, token: Token) -> bool:
             col += direction_col
         return count
 
+
+def check_for_win(grid: Grid, token: Token) -> bool:
     for col in range(7):
         for row in range(6):
             if grid[col][row] == token:
-                if (check_direction(row, col, 1, 0) >= 4 or  # vertical check
-                    check_direction(row, col, 0, 1) >= 4 or  # horizontal check
-                    check_direction(row, col, 1, 1) >= 4 or  # diagonal down-right
-                    check_direction(row, col, 1, -1) >= 4):  # diagonal up-right
+                if (check_direction(grid, row, col, 1, 0, token) >= 4 or  # vertical 
+                    check_direction(grid, row, col, 0, 1, token) >= 4 or  # horizontal 
+                    check_direction(grid, row, col, 1, 1, token) >= 4 or  # diagonal negative right
+                    check_direction(grid, row, col, 1, -1,token) >= 4):  # diagonal positive right
                     return True
     return False
 
@@ -131,27 +133,27 @@ def check_grid_full(grid: Grid) -> bool:
 def turn_by_turn(grid: Grid, playerIdx: int, tokens: Tuple[Token, Token]) -> Tuple[Grid, bool]:
     print_grid(grid)
     print(f"Player {playerIdx + 1}'s turn ({tokens[playerIdx]}):")
-    columnIdx = prompt_for_token_placement()
-    newColumn = drop_token_in_column(grid[columnIdx], tokens[playerIdx])
-    if newColumn is None:
-        print("Column is full! Try a different column.")
-        return grid, False
+    
+    while True:
+        columnIdx = prompt_for_token_placement()
+        newColumn = drop_token_in_column(grid[columnIdx], tokens[playerIdx])
+        if newColumn is not None:
+            break
+        else:
+            print("Column is full! Try a different column.")
+    
     newGrid = place_new_column_in_grid(grid, columnIdx, newColumn)
 
     if check_for_win(newGrid, tokens[playerIdx]):
         print_grid(newGrid)
         print(f"Player {playerIdx + 1} ({tokens[playerIdx]}) wins!")
         return newGrid, True
-    
-    if check_for_win(newGrid, tokens[playerIdx]):
-        print_grid(newGrid)
-        print(f"Player {playerIdx + 1} ({tokens[playerIdx]}) wins!")
-        return newGrid, True
-    
+        
     if check_grid_full(newGrid):
         print_grid(newGrid)
         print("The game is a draw!")
         return newGrid, True
+    
     return newGrid, False
 
 def game_loop(grid: Grid, playerIdx: int, tokens: Tuple[Token, Token]):
@@ -178,13 +180,14 @@ def exit_game():
     print("TODO: Need to add quit prompt declaratively ")
     quit()
 
-def prompt_for_main_menu_input():
+def prompt_for_main_menu_input(msg:str=MAIN_MENU_MSG, err: str = "ERROR: not a valid menu option") -> MainMenuOption:
     while True:
-        match MainMenuOption.parse(input(MAIN_MENU_OPTION)):
+        match MainMenuOption.parse(input(msg)):
+            case None:
+                print(err, file=sys.stderr)
             case x if type(x) == MainMenuOption:
                 return x
-            case _:
-                print("ERROR: not a valid menu option")
+            
 
 def branch_to_game_feature(opt: MainMenuOption):
     match opt:
