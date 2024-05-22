@@ -3,7 +3,17 @@ from typing import Final, Tuple, TypeAlias, Optional
 import numpy as np 
 from dataclasses import dataclass
 
-MAIN_MENU_OPTION: Final[str] = "Enter 1 for Single Player, 2 for Multi Player, or 3 to Exit: "
+MAIN_MENU_OPTION: Final[str] = """
+Welcome to Connect Four!
+
+What would you like to do?
+
+1. Singleplayer
+2. Multiplayer
+3. Exit
+
+Enter the number of the option you would like to select (e.g., 1):
+"""
 TOKEN_MENU_OPTION: Final[str] = "Enter R to play as the red token or Y to play as the yellow token: "
 TOKEN_PLACEMENT_COLUMN: Final[str] = "What column do you want the token in?, between (1-7): "
 InputText: TypeAlias = str
