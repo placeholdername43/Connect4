@@ -64,6 +64,7 @@ def print_grid(grid: Grid):
             print(f" {cell if cell is not None else ' '} ", end="|")
         print()
     print(" " + "   ".join(map(str, range(1, 8))))
+
     
 def prompt_for_token_placement() -> int:
     while True:
@@ -84,7 +85,33 @@ def check_for_win(g: Grid, t: Token) -> bool:
     # a win can be horizontal, diagonal, vertical
     # how will i check thru the grid in all directions to determine a win
     # potentially a function to check in each direction?
+    # check diagonal only when needed 
     pass
+
+def check_for_vertical_win(g: Grid, t: Token):
+    # 0,5   
+    # 0,4
+    # 0,3
+    # 0,2
+    
+    # 0,4
+    # 0,3
+    # 0,2
+    # 0,1
+    
+    # 0,3
+    # 0,2
+    # 0,1
+    # 0,0 
+
+    # if two nones remain, then there can be a vertical win
+    count = 6
+
+    for column in g:
+        print(column)
+        for cell in column:
+            
+            
 
 def drop_token_in_column(c:Column, t:Token) -> Optional[Column]:
     match check_any_empty_cell(c):
@@ -111,10 +138,17 @@ def turn_by_turn(grid: Grid, playerIdx: int, tokens: Tuple[Token, Token]) -> Tup
         print("Column is full! Try a different column.")
         return grid, False
     newGrid = place_new_column_in_grid(grid, columnIdx, newColumn)
+
     if check_for_win(newGrid, tokens[playerIdx]):
         print_grid(newGrid)
         print(f"Player {playerIdx + 1} ({tokens[playerIdx]}) wins!")
         return newGrid, True
+    
+    if check_for_vertical_win(newGrid, tokens[playerIdx]):
+        print_grid(newGrid)
+        print(f"Player {playerIdx + 1} ({tokens[playerIdx]}) wins!")
+        return newGrid, True
+    
     if check_grid_full(newGrid):
         print_grid(newGrid)
         print("The game is a draw!")

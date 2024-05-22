@@ -1,1 +1,2 @@
-grid[:columnIdx] + (newColumn,) + grid[columnIdx + 1:]
+to determine a win
+    # potentially a function to check in each direction
