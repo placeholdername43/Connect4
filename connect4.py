@@ -81,36 +81,43 @@ def check_any_empty_cell(c: Column) -> Optional[int]:
             return i
     return None
 
-def check_for_win(g: Grid, t: Token) -> bool:
-    # a win can be horizontal, diagonal, vertical
-    # how will i check thru the grid in all directions to determine a win
-    # potentially a function to check in each direction?
-    # check diagonal only when needed 
-    pass
+def check_for_win(grid: Grid, token: Token) -> bool:
+    def check_direction(start_row, start_col, dir_row, dir_col):
+        count = 0
+        row, col = start_row, start_col
+        while 0 <= row < 6 and 0 <= col < 7 and grid[col][row] == token:
+            count += 1
+            row += dir_row
+            col += dir_col
+        return count
 
-def check_for_vertical_win(g: Grid, t: Token):
-    # 0,5   
-    # 0,4
-    # 0,3
-    # 0,2
-    
-    # 0,4
-    # 0,3
-    # 0,2
-    # 0,1
-    
-    # 0,3
-    # 0,2
-    # 0,1
-    # 0,0 
+    for col in range(7):
+        for row in range(6):
+            if grid[col][row] == token:
+                if (check_direction(row, col, 1, 0) >= 4 or  # vertical check
+                    check_direction(row, col, 0, 1) >= 4 or  # horizontal check
+                    check_direction(row, col, 1, 1) >= 4 or  # diagonal down-right
+                    check_direction(row, col, 1, -1) >= 4):  # diagonal up-right
+                    return True
+    return False
+"""def check_for_win(grid: Grid, token: Token) -> bool:
+    directions = [(1, 0), (0, 1), (1, 1), (1, -1)]
 
-    # if two nones remain, then there can be a vertical win
-    count = 6
+    def check_direction(start_row, start_col, dir_row, dir_col):
+        return all(
+            0 <= start_row + i * dir_row < 6 and
+            0 <= start_col + i * dir_col < 7 and
+            grid[start_col + i * dir_col][start_row + i * dir_row] == token
+            for i in range(4)
+        )
 
-    for column in g:
-        print(column)
-        for cell in column:
-            
+    return any(
+        any(
+            grid[col][row] == token and any(check_direction(row, col, dr, dc) for dr, dc in directions)
+            for row in range(6)
+        )
+        for col in range(7)
+    ) """
             
 
 def drop_token_in_column(c:Column, t:Token) -> Optional[Column]:
@@ -144,7 +151,7 @@ def turn_by_turn(grid: Grid, playerIdx: int, tokens: Tuple[Token, Token]) -> Tup
         print(f"Player {playerIdx + 1} ({tokens[playerIdx]}) wins!")
         return newGrid, True
     
-    if check_for_vertical_win(newGrid, tokens[playerIdx]):
+    if check_for_win(newGrid, tokens[playerIdx]):
         print_grid(newGrid)
         print(f"Player {playerIdx + 1} ({tokens[playerIdx]}) wins!")
         return newGrid, True
@@ -164,7 +171,8 @@ def singleplayer():
     print("Singleplayer placeholder.")
 
 def multiplayer():
-    player1_token = prompt_for_token_type()
+    print("Player 1: Select a token")
+    player1_token : Token = prompt_for_token_type()
     if isinstance(player1_token, R):
         player2_token = Y()
     else:
