@@ -1,30 +1,40 @@
 import pytest
 import sys
-
 from connect4 import *
 
-def test_parse_main_menu():
-    assert MainMenuOption.parse("1") == MainMenuOption.SinglePlayer
-    assert MainMenuOption.parse("2") == MainMenuOption.MultiPlayer
-    assert MainMenuOption.parse("3") == MainMenuOption.Exit
-    assert MainMenuOption.parse("4") is None 
+def test_parse_main_menu_singleplayer_valid():
+    assert all(map(lambda input_p: MainMenuOption.parse(input_p) == MainMenuOption.SinglePlayer, ["singleplayer", "1"]))     
+  
+def test_parse_main_menu_multiplayer_valid():
+    assert all(map(lambda input_p: MainMenuOption.parse(input_p) == MainMenuOption.MultiPlayer, ["multiplayer", "2"]))     
 
-def test_parse_exit():
+def test_parse_main_menu_exit_valid():
+    assert all(map(lambda input_p: MainMenuOption.parse(input_p) == MainMenuOption.Exit, ["exit", "3"]))     
+
+def test_parse_main_menu_invalid():
+    assert all(map(lambda input_p: MainMenuOption.parse(input_p) == None, ["aaaa", "3000"]))       
+  
+def test_parse_exit_yes():
     assert parse_exit("Y") == True
+
+def test_parse_exit_no():
     assert parse_exit("N") == False
 
-def test_parse_token():
-    assert isinstance(parse_token("R"), R)
-    assert isinstance(parse_token("1"), R)
-    assert isinstance(parse_token("y"), Y)
-    assert isinstance(parse_token("2"), Y)
-    assert parse_token("green") is None
+def test_parse_token_valid_Red():
+    assert all(map(lambda input_p: isinstance(parse_token(input_p), R), ["r", "1", "red"]))       
 
-def test_parse_column():
+def test_parse_token_valid_Yellow():
+    assert all(map(lambda input_p: isinstance(parse_token(input_p), Y), ["y", "2", "yellow"]))  
+
+def test_parse_token_invalid_input():
+    assert all(map(lambda input_p: (parse_token(input_p) == None), ["g","900","green"]))           
+
+def test_parse_column_valid():
     assert parse_column("1") == 0
     assert parse_column("7") == 6
-    assert parse_column("8") is None  
-    assert parse_column("zero") is None  
+
+def test_parse_column_invalid():
+    assert all(map(lambda input_p: (parse_column(input_p) == None), ["-5","900","column 5043"]))         
 
 def test_exit_game(monkeypatch):
     monkeypatch.setattr('connect4.prompt_for_exit_confirmation', lambda: True)
@@ -35,21 +45,19 @@ def test_exit_game(monkeypatch):
 
 def test_not_exit_game(monkeypatch):
     monkeypatch.setattr('connect4.prompt_for_exit_confirmation', lambda: False)
-    exit_game()
-
-
-
-def test_drop_token_in_column():
+    
+def test_drop_token_in_empty_column():
     column = (None, None, None, None, None, None)
     new_column = drop_token_in_column(column, R())
     assert new_column == (R(), None, None, None, None, None)
 
+def test_drop_token_in_full_column():
     full_column = (R(), R(), R(), R(), R(), R())
     assert drop_token_in_column(full_column, R()) is None
 
 def test_check_for_win_horizontal():
     grid = create_empty_grid()
-    grid = place_new_column_in_grid(grid, 0, (R(), R(), R(), None, None, None))
+    grid = place_new_column_in_grid(grid, 0, (R(), None, None, None, None, None))
     grid = place_new_column_in_grid(grid, 1, (R(), None, None, None, None, None))
     grid = place_new_column_in_grid(grid, 2, (R(), None, None, None, None, None))
     grid = place_new_column_in_grid(grid, 3, (R(), None, None, None, None, None))
