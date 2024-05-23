@@ -50,17 +50,17 @@ Cell: TypeAlias = Optional[Token] # define the cell type
 Column: TypeAlias = Tuple[Cell, Cell, Cell, Cell, Cell, Cell] # defining a column as a tuple of 6 cells reflecting the 6 high grid of connect 4
 Grid: TypeAlias = Tuple[Column, Column, Column, Column, Column, Column, Column] # a grid is therefore a tuple of 7 columns reflecting the 7 high grid of connect4
 
-def prompt_for_token_type() -> Optional[Token]:
+def prompt_for_token_type(msg: str = TOKEN_MENU_OPTION, err: str = "ERROR: Invalid input, please select a valid token R/Y") -> Optional[Token]:
     while True:
-        s: InputText = input(TOKEN_MENU_OPTION)
+        s: InputText = input(msg)
         match s.lower():
             case "r" | "red" | "1":
                 return R()
             case "y" | "yellow" | "2":
                 return Y()
             case _:
-                print("Invalid token type, R or Y")
-                prompt_for_token_type()
+                print(err, file=sys.stderr)
+                
 
 def create_empty_grid() -> Grid:
     c: Column = (None, None, None, None,None, None)
