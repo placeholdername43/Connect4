@@ -103,6 +103,7 @@ def check_any_empty_cell(c: Column) -> Optional[int]:
             return i
     return None
 
+# change to list comprehension
 def check_direction(grid: Grid, start_row, start_col, direction_row, direction_col, token) -> int:
     count = 0
     row = start_row
@@ -184,7 +185,7 @@ def multiplayer():
     grid = create_empty_grid()
     game_loop(grid, 0, tokens)
 
-def exit_game():
+def exit_game(): 
     confirmation = prompt_for_exit_confirmation()
     if confirmation:
         print("Thank you for playing Connect Four. Goodbye!")

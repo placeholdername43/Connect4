@@ -1,7 +1,7 @@
 import pytest
 import sys
 from connect4 import *
-
+  
 def test_parse_main_menu_singleplayer_valid():
     assert all(map(lambda input_p: MainMenuOption.parse(input_p) == MainMenuOption.SinglePlayer, ["singleplayer", "1"]))     
   
