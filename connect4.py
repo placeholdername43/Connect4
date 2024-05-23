@@ -171,7 +171,7 @@ def game_loop(grid: Grid, playerIdx: int, tokens: Tuple[Token, Token]):
         game_loop(new_grid, 1 - playerIdx, tokens)
 
 def singleplayer():
-    print("Singleplayer placeholder.")
+    print("Singleplayer placeholder ")
 
 def multiplayer():
     print("Player 1: Select a token")
