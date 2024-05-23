@@ -1,7 +1,6 @@
 from enum import Enum
 import sys
-from typing import Final, Tuple, TypeAlias, Optional
-import numpy as np 
+from typing import Final, Tuple, TypeAlias, Optional, Union, Callable
 from dataclasses import dataclass
 
 MAIN_MENU_MSG: Final[str] = """
@@ -25,24 +24,25 @@ class MainMenuOption(Enum):
     Exit = 3
     @staticmethod
     def parse(s: InputText) -> Optional['MainMenuOption']: # this is a forward declaration
-        #when python figures out waht the menuoption is, itll come back and give valid returnvalues
+        #when python figures out waht the menuoption is, itll come back and give valid returnvalue
         match s.strip().lower():
             case "1" | "singleplayer": return MainMenuOption.SinglePlayer
             case "2" | "multiplayer": return MainMenuOption.MultiPlayer
             case "3" | "exit": return MainMenuOption.Exit
             case _: return None
-                      
 # we want tokens to be immutable, hence the frozen, both tokens are also equal
-@dataclass(eq = True, frozen = True) 
+@dataclass(eq=True, frozen=True)
 class R():
     def __repr__(self) -> str:
         return "R"
     pass
-@dataclass(eq= True, frozen = True)
+
+@dataclass(eq=True, frozen=True)
 class Y():
     def __repr__(self) -> str:
         return "Y"
     pass
+
 
 Token: TypeAlias = R | Y 
 Cell: TypeAlias = Optional[Token] # define the cell type 
@@ -50,41 +50,44 @@ Cell: TypeAlias = Optional[Token] # define the cell type
 Column: TypeAlias = Tuple[Cell, Cell, Cell, Cell, Cell, Cell] # defining a column as a tuple of 6 cells reflecting the 6 high grid of connect 4
 Grid: TypeAlias = Tuple[Column, Column, Column, Column, Column, Column, Column] # a grid is therefore a tuple of 7 columns reflecting the 7 high grid of connect4
 
-def prompt_for_token_type(msg: str = TOKEN_MENU_OPTION, err: str = "ERROR: Invalid input, please select a valid token R/Y") -> Optional[Token]:
-    while True:
-        s: InputText = input(msg)
-        match s.lower():
-            case "r" | "red" | "1":
-                return R()
-            case "y" | "yellow" | "2":
-                return Y()
-            case _:
-                print(err, file=sys.stderr)
-                
+def prompt_for_input(parse_func: Callable[[str], Optional[MainMenuOption | Token | int]], message: str, err_msg: str) -> Callable[[], MainMenuOption | Token | int]:
+    def inner():
+        while True:
+            match parse_func(input(message)):
+                case None:
+                    print(err_msg, file=sys.stderr)
+                case x:
+                    return x
+    return inner
+
+def parse_token(s: InputText) -> Optional[Token]:
+    match s.lower():
+        case "r" | "red" | "1": return R()
+        case "y" | "yellow" | "2": return Y()
+        case _: return None
+
+def parse_column(s: InputText) -> Optional[int]:
+    if s.isdigit() and 1 <= int(s) <= 7:
+        return int(s) - 1
+    return None
+
+prompt_for_token_type = prompt_for_input(parse_token, TOKEN_MENU_OPTION, "ERROR: Invalid input, please select a valid token R/Y")
+prompt_for_column = prompt_for_input(parse_column, TOKEN_PLACEMENT_COLUMN, "ERROR: Invalid input, please select a column between 1-7")
+prompt_for_main_menu_input = prompt_for_input(MainMenuOption.parse, MAIN_MENU_MSG, "ERROR: not a valid menu option")
 
 def create_empty_grid() -> Grid:
-    c: Column = (None, None, None, None,None, None)
-    g : Grid = (c,c,c,c,c,c,c)
+    c: Column = (None, None, None, None, None, None)
+    g: Grid = (c, c, c, c, c, c, c)
     return g
 
-def print_grid(grid: Grid) -> None: # change to render and seperate print
+def print_grid(grid: Grid) -> None:  # change to render and seperate print
     for row in range(5, -1, -1):
         print("|", end="")
         for column in grid:
-            cell = column[row]  # A cell is a point intersecting a certain row and column
+            cell = column[row]
             print(f" {cell if cell is not None else ' '} ", end="|")
         print()
     print(" " + "   ".join(map(str, range(1, 8))))
-
-def prompt_for_token_placement(msg: str = TOKEN_PLACEMENT_COLUMN, err : str = "ERROR: Invalid input, please select a column between 1-7") -> int:
-    while True:
-        n = input(msg)
-        match n:
-            case None:
-                print(err, file=sys.stderr)
-            case _ if n.isdigit() and 1 <= int(n) <= 7:
-                return int(n) - 1
-            
 
 def check_any_empty_cell(c: Column) -> Optional[int]:
     for i in range(len(c)):
@@ -93,15 +96,14 @@ def check_any_empty_cell(c: Column) -> Optional[int]:
     return None
 
 def check_direction(grid: Grid, start_row, start_col, direction_row, direction_col, token) -> int:
-        count = 0
-        row = start_row
-        col = start_col
-        while 0 <= row < 6 and 0 <= col < 7 and grid[col][row] == token:
-            count += 1
-            row += direction_row
-            col += direction_col
-        return count
-
+    count = 0
+    row = start_row
+    col = start_col
+    while 0 <= row < 6 and 0 <= col < 7 and grid[col][row] == token:
+        count += 1
+        row += direction_row
+        col += direction_col
+    return count
 
 def check_for_win(grid: Grid, token: Token) -> bool:
     for col in range(7):
@@ -110,23 +112,22 @@ def check_for_win(grid: Grid, token: Token) -> bool:
                 if (check_direction(grid, row, col, 1, 0, token) >= 4 or  # vertical 
                     check_direction(grid, row, col, 0, 1, token) >= 4 or  # horizontal 
                     check_direction(grid, row, col, 1, 1, token) >= 4 or  # diagonal negative right
-                    check_direction(grid, row, col, 1, -1,token) >= 4):  # diagonal positive right
+                    check_direction(grid, row, col, 1, -1,token) >= 4):  # diagonal positive righ
                     return True
     return False
 
-def drop_token_in_column(c:Column, t:Token) -> Optional[Column]:
+def drop_token_in_column(c: Column, t: Token) -> Optional[Column]:
     match check_any_empty_cell(c):
         case None:
             return None
         case i:
             newColumn = list(c)
             newColumn[i] = t
-            result : Column = tuple(newColumn)
-            return result
-        
+            return tuple(newColumn)
+
 def place_new_column_in_grid(grid: Grid, columnIdx: int, newColumn: Column) -> Grid:
     return grid[:columnIdx] + (newColumn,) + grid[columnIdx + 1:]
-        
+
 def check_grid_full(grid: Grid) -> bool:
     return not any(check_any_empty_cell(col) is not None for col in grid)
 
@@ -135,7 +136,7 @@ def turn_by_turn(grid: Grid, playerIdx: int, tokens: Tuple[Token, Token]) -> Tup
     print(f"Player {playerIdx + 1}'s turn ({tokens[playerIdx]}):")
     
     while True:
-        columnIdx = prompt_for_token_placement()
+        columnIdx = prompt_for_column()
         newColumn = drop_token_in_column(grid[columnIdx], tokens[playerIdx])
         if newColumn is not None:
             break
@@ -180,15 +181,6 @@ def exit_game():
     print("TODO: Need to add quit prompt declaratively ")
     quit()
 
-def prompt_for_main_menu_input(msg:str=MAIN_MENU_MSG, err: str = "ERROR: not a valid menu option") -> MainMenuOption:
-    while True:
-        match MainMenuOption.parse(input(msg)):
-            case None:
-                print(err, file=sys.stderr)
-            case x if type(x) == MainMenuOption:
-                return x
-            
-
 def branch_to_game_feature(opt: MainMenuOption):
     match opt:
         case MainMenuOption.SinglePlayer:
@@ -201,7 +193,7 @@ def branch_to_game_feature(opt: MainMenuOption):
 def main():
     while True:
         menu_option = prompt_for_main_menu_input()
-        grid = branch_to_game_feature(menu_option)
+        branch_to_game_feature(menu_option)
 
 if __name__ == "__main__":
     main()
