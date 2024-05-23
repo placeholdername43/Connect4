@@ -16,6 +16,7 @@ Enter the number of the option you would like to select (e.g., 1):
 """
 TOKEN_MENU_OPTION: Final[str] = "Enter R to play as the red token or Y to play as the yellow token: "
 TOKEN_PLACEMENT_COLUMN: Final[str] = "What column do you want the token in?, between (1-7): "
+EXIT_CONFIRMATION_MSG: Final[str] = "Are you sure you would like to exit? (enter y/n)"
 InputText: TypeAlias = str
 
 class MainMenuOption(Enum):
@@ -71,9 +72,16 @@ def parse_column(s: InputText) -> Optional[int]:
         return int(s) - 1
     return None
 
+def parse_exit(s: InputText) -> Optional[int]:
+    match s.lower():
+        case "y" | "yes" | "1": return True
+        case "n" | "no" | "2": return False
+        case _: return None
+
 prompt_for_token_type = prompt_for_input(parse_token, TOKEN_MENU_OPTION, "ERROR: Invalid input, please select a valid token R/Y")
 prompt_for_column = prompt_for_input(parse_column, TOKEN_PLACEMENT_COLUMN, "ERROR: Invalid input, please select a column between 1-7")
 prompt_for_main_menu_input = prompt_for_input(MainMenuOption.parse, MAIN_MENU_MSG, "ERROR: not a valid menu option")
+prompt_for_exit_confirmation = prompt_for_input(parse_exit, EXIT_CONFIRMATION_MSG, "ERROR: Please input yes to exit the game or no to stay")
 
 def create_empty_grid() -> Grid:
     c: Column = (None, None, None, None, None, None)
@@ -177,9 +185,10 @@ def multiplayer():
     game_loop(grid, 0, tokens)
 
 def exit_game():
-    print("Are you sure you would like to quit? Y/N")
-    print("TODO: Need to add quit prompt declaratively ")
-    quit()
+    confirmation = prompt_for_exit_confirmation()
+    if confirmation:
+        print("Thank you for playing Connect Four. Goodbye!")
+        sys.exit(0)
 
 def branch_to_game_feature(opt: MainMenuOption):
     match opt:
