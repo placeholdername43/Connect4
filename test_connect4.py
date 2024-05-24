@@ -68,12 +68,15 @@ def test_check_for_win_vertical():
     grid = place_new_column_in_grid(grid, 0, (R(), R(), R(), R(), None, None))
     assert check_for_win(grid, R())
 
-def test_check_for_win_diagonal():
+def test_check_for_win_diagonal_positive():
     grid = create_empty_grid()
-    grid = place_new_column_in_grid(grid, 0, (R(), None, None, None, None, None))
-    grid = place_new_column_in_grid(grid, 1, (None, R(), None, None, None, None))
-    grid = place_new_column_in_grid(grid, 2, (None, None, R(), None, None, None))
-    grid = place_new_column_in_grid(grid, 3, (None, None, None, R(), None, None))
+    grid = place_new_column_in_grid(grid, 0, (None, None, None, R(), None, None))
+    grid = place_new_column_in_grid(grid, 1, (None, None, R(), None, None, None))
+    grid = place_new_column_in_grid(grid, 2, (None, R(), None, None, None, None))
+    grid = place_new_column_in_grid(grid, 3, (R(), None, None, None, None, None))
+    
+    
+    
     assert check_for_win(grid, R())
 
 if __name__ == "__main__":

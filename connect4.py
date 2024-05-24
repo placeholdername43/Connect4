@@ -166,7 +166,7 @@ def turn_by_turn(grid: Grid, playerIdx: int, tokens: Tuple[Token, Token]) -> Tup
     
     return newGrid, False
 
-def game_loop(grid: Grid, playerIdx: int, tokens: Tuple[Token, Token]):
+def game_loop(grid: Grid, playerIdx: int, tokens: Tuple[Token, Token]) -> None:
     new_grid, game_over = turn_by_turn(grid, playerIdx, tokens)
     if not game_over:
         game_loop(new_grid, 1 - playerIdx, tokens)
@@ -174,7 +174,7 @@ def game_loop(grid: Grid, playerIdx: int, tokens: Tuple[Token, Token]):
 def singleplayer():
     print("Singleplayer placeholder ")
 
-def multiplayer():
+def multiplayer() -> None:
     print("Player 1: Select a token")
     player1_token : Token = prompt_for_token_type()
     if isinstance(player1_token, R):
@@ -185,13 +185,13 @@ def multiplayer():
     grid = create_empty_grid()
     game_loop(grid, 0, tokens)
 
-def exit_game(): 
+def exit_game() -> None:
     confirmation = prompt_for_exit_confirmation()
     if confirmation:
         print("Thank you for playing Connect Four. Goodbye!")
         sys.exit(0)
 
-def branch_to_game_feature(opt: MainMenuOption):
+def branch_to_game_feature(opt: MainMenuOption) -> None:
     match opt:
         case MainMenuOption.SinglePlayer:
             singleplayer()
