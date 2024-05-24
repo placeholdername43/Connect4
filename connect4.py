@@ -171,7 +171,7 @@ def game_loop(grid: Grid, playerIdx: int, tokens: Tuple[Token, Token]) -> None:
     if not game_over:
         game_loop(new_grid, 1 - playerIdx, tokens)
 
-def singleplayer():
+def singleplayer() -> None:
     print("Singleplayer placeholder ")
 
 def multiplayer() -> None:
@@ -200,7 +200,7 @@ def branch_to_game_feature(opt: MainMenuOption) -> None:
         case MainMenuOption.Exit:
             exit_game()
 
-def main():
+def main() -> None:
     while True:
         menu_option = prompt_for_main_menu_input()
         branch_to_game_feature(menu_option)
